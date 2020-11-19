@@ -97,3 +97,21 @@ $[z_{-a/2}\sqrt{I(\theta)^-1}, z_{a/2}\sqrt{I(\theta)^-1}]$
 
 
 # Question 2
+
+**a)** 
+
+Like question 1a our likelihood is the product of the censored and the noncencored data. 
+Since we know that the Normal distribution belongs to the exponential family, we could recompute the likelihood and prove the statement. 
+However, this involves a lot of calculations, mostly to calculate the CDF of a normal distribution and to then manipulate it by multiplying it with the PDF
+in order to derive a distribution of $X_i$. Fortunately, there is an easier way to show this result. 
+
+We know that $Y_i \sim N(\mu, \sigma^2)$ If we can show that $X_i \sim N(\mu, \sigma^2)$ then the result is trivial. 
+
+$X_i = YiRi + D(1-R_i)$
+
+Since our $X$ is an affine transformation of a normal, we can write it as $X = g(Y)$ where $g$ linear. 
+Together with the fact that $R_i$ have a binary nature of $0 \lor 1$ we have our result.
+
+So. $X_i \sim N(\mu, \sigma^2)$
+
+Hence: $\log L(\mu, \sigma^2 | x, r) = \log \prod [\phi(x_i;\mu, \sigma^2)^{r_i} \times \Phi(x_i; \mu, \sigma^2)] = \sum_{i=1}^n\{r_i\log \phi(x_i, \mu, \sigma^2) + (1-r_i)\Phi(x_1; \mu, \sigma^2)\}$
