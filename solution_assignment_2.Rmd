@@ -1,0 +1,99 @@
+---
+title: "Assignment 2 Solution"
+author: "Ted Ladas"
+date: "11/18/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+$F(y;\theta) = 1 - e^{-y^2/(2\theta)}$ and $y\geq0, \theta\geq0$ and 
+\\
+
+$X_i = \begin{cases}
+            Y_i & Y_i\leq C\\
+            C & Y_i>C\\
+          \end{cases}$
+
+$R_i = \begin{cases}
+            1 & Y_i\leq C\\
+            0 & Y_i>C\\
+          \end{cases}$
+          
+**a)** Calculation of $\hat{\theta}_{MLE}$ 
+
+We need to calculate the pdf of the data given theta, the survival function of the upper censor point, and the Likelihood of the data given theta.
+In order to reach the conclusion of the exercise I will define first these. 
+
+$X_i = Y_iR_i + C(1-R_i) 	\iff X_i^2 = Y_i^2R_i^2 + 2Y_iR_iC(1-R_i) + C^2(1-R_i)^2$
+
+
+$\text{We know that} ~~R_i = 0 ~~	\lor~~ R_i=1 ~~\text{therefore}~~ 2Y_iR_iC(1-R_i)=0$
+
+
+$\text{If} ~~R_i = 0 ~~ \text{then}~~ R_i^2 = R_i ~~and~~ (1-R_i)^2 = (1-R_i)$
+
+
+$\text{If} ~~R_i = 1 ~~ \text{then}~~ R_i^2 = R_i ~~and~~ (1-R_i)^2 = (1-R_i)$
+
+
+$\text{Therefore}~~ R_i^2 = R_i~~ and ~~(1-R_i)^2 = (1-R_i)$
+
+
+$\text{So, Finally:}~~ X_i^2 = Y_i^2R_i + C^2(1-R_i)$
+
+We also have to have an expression for the Survival function:
+
+$S(C;\theta) = 1 - F(y;\theta) \iff S(C;\theta) = e^{-y^2/(2\theta)}$
+
+And finally we need to derive the pdf of the data
+
+$f(y;\theta) = \frac{\partial}{\partial y} F(y;\theta) \iff f(y;\theta) = \frac{1}{\theta} y e^{-y^2/(2\theta)}$
+
+
+So we can start: 
+
+$L(\theta) = \prod_i\{(f(y;\theta))^{r_i}(S(C;\theta))^{(1-r_i)}\} = \prod_i\{(\frac{1}{\theta} y e^{-y^2/(2\theta)})^{r_i}(e^{-C^2/(2\theta)})^{(1-r_i)}\} =$
+
+$\theta^{-\sum{r_i}} \sum{y_i^{r_i}} e^{-\sum{y_i^2r_i + C^2(1-r_i)}} = \theta^{-\sum{r_i}} \sum{y_i^{r_i}} e^{-\sum{X_i^2}}$
+
+
+$\ln L(\theta) = \ell(\theta) = -\sum{r_i}\ln\theta - \frac{1}{2\theta}\sum{X_i^2} + \ln\sum{y_i^{r_i}}$
+
+$\frac{\partial}{\partial \theta} \ell(\theta) = 0 \iff -\frac{\sum{r_i}}{\theta} + \frac{\sum{X_i^2}}{2\theta^2} + 0 = 0 \iff \frac{-2\theta\sum{r_i}+\sum{X_i^2}}{2\theta^2} = 0$
+
+and since $\theta \geq 0$ 
+
+$-2\theta\sum{r_i}+\sum{X_i^2} = 0 \iff \hat{\theta_{MLE}} = \frac{\sum{X_i^2}}{2\sum{r_i}}$
+
+
+**b)** We know that $I(\theta) = -\mathbb{E}\left[\frac{d^2l(\theta)}{d\theta^2}\right]$
+
+and also that $\mathbb{E}[R_i] = 1P(R_i=1) + 0P(R_i=0) = P(Y\leq C) = F(C;\theta) = 1 - e^{-C^2/(2\theta)} ~~\text{and therefore}~~ \mathbb{E}[1 - R_i] = 1 - \mathbb{E}[R_i] = e^{-C^2/(2\theta)}$
+
+so if we decompose $\sum{X_i^2}$ again we have:
+
+$I(\theta) = -\frac{\sum\mathbb{E}{[r_i]}}{\theta^2} + \frac{\sum\mathbb{E}{[Y_i^2r_i]}}{\theta^3} + \frac{\sum\mathbb{E}[{C^2(1-r_i)]}}{\theta^3} =$
+
+
+$n/\theta^2 (1 - e^{-C^2/(2\theta)}) n/\theta^3 (-C^2e^{-C2/2\theta} + 2\theta(1 - e^{-C^2/(2\theta)}) - e^{-C^2/(2\theta)}))$
+
+$I(\theta) = \frac{n}{\theta^2}(1 - e^{-C^2/(2\theta)})$
+
+
+**c)** Since we know that $\hat{\theta_{MLE}} \sim N(\theta , I(\theta)^{-1})~~$ we can Normalize $\hat{\theta_{MLE}}$ and produce the 95% confidence interval as follows
+
+$Z = \frac{\hat{\theta_{MLE}} - \theta}{\sqrt{I(\theta)^{-1}}} \sim N(0,1)$
+
+$P(z_{a/2} \leq Z \leq z_{a/2}) = 1 - a$
+
+$a = 0.05 ~~\text{hence}~~ z_{-a/2} = -1.959964, z_{a/2} = 1.959964$
+
+$[z_{-a/2}\sqrt{I(\theta)^-1}, z_{a/2}\sqrt{I(\theta)^-1}]$
+
+
+# Question 2
