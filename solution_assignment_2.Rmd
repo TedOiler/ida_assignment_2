@@ -129,12 +129,12 @@ ll <- function(m, df){
   sigma = sqrt(1.5)
   x_i = df[,1]
   r_i = df[,2]
-  likelihood_f = sum(r_i*dnorm(x_i, mean=mu, sd=sigma, log=TRUE) + (1-r_i)*pnorm(x_i, mean=mu, sd=sigma, log=TRUE))
+  likelihood_f = sum(r_i*dnorm(x_i, mean=mu, sd=sigma, log=TRUE) + (1-r_i)*pnorm(x_i, mean=mu, sd=sigma, log=TRUE)) #log=TRUE: to avoid underflow, instead of log(dnorm(...))
   return(likelihood_f)
 }
 
 start = c(mu=1)
-mle = maxLik(logLik = ll, df=dataex2, start=start)
+mle = maxLik(logLik = ll, df=dataex2, start=start, method='nr') # Newton-Raphson method is the fastest of all I tried. Speculating because of the simplicity of the df.
 print(mle)
 ```
 
