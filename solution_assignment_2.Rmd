@@ -1,7 +1,6 @@
 ---
 title: "Assignment 2 Solution"
-author: "Ted Ladas"
-date: "11/18/2020"
+author: "Ted Ladas -s2124289"
 output: pdf_document
 ---
 
@@ -118,7 +117,7 @@ Hence: $\log L(\mu, \sigma^2 | x, r) = \log \prod [\phi(x_i;\mu, \sigma^2)^{r_i}
 
 **b)** --> $\mu = 5.559766$
 
-```{r, include=TRUE, message=FALSE, tidy=TRUE, fig.align='center', results="hold"}
+```{r, include=TRUE, message=FALSE, warning=FALSE, tidy=TRUE, fig.align='center', results="hold"}
 # https://cran.r-project.org/web/packages/maxLik/maxLik.pdf
 
 library(maxLik)
@@ -130,12 +129,38 @@ ll <- function(m, df){
   x_i = df[,1]
   r_i = df[,2]
   likelihood_f = sum(r_i*dnorm(x_i, mean=mu, sd=sigma, log=TRUE) + (1-r_i)*pnorm(x_i, mean=mu, sd=sigma, log=TRUE)) #log=TRUE: to avoid underflow, instead of log(dnorm(...))
+  #Nice to have: modify the optimization newton-raphson function we wrote on statistical programming to optimize this problem as well.
   return(likelihood_f)
 }
 
 start = c(mu=1)
 mle = maxLik(logLik = ll, df=dataex2, start=start, method='nr') # Newton-Raphson method is the fastest of all I tried. Speculating because of the simplicity of the df.
-print(mle)
+summary(mle)
 ```
 
 
+# Question 3
+
+Based on the lecture 'Likelihood based inference with incomplete data' we know that a missing data mechanism is ignorable for likelihood inference iff:
+
+1) The missing data are MAR (or MCAR)
+2) the parameter $\psi$ which is the parameter of the missing mechanism and the parameters of the model $\theta$ are distinct. 
+
+On this example we know that they are distinct because in all the sub-question is is stated. 
+So we only have to consider the first point to answer the question. 
+
+What we are doing on each example is the following 
+We express the probability of a datapoint missing as a linear model of various other variables and parameters. 
+The logit() function serves the purpose of transforming the support of our probability $R_f \in [0,1]$ to $R_{logit{f}} \in (-\infty, +\infty)$ so that our line makes sense.
+
+**(a)** Missing data mechanism --> MAR. 
+This is true because the missingness depends on $Y_1$ which is fully observed. 
+Therefore the mechanism is ignorable for likelihood-based estimation
+
+**(b)** Missing data mechanism --> MNAR
+This is true because the missingness depends on $Y_2$ which is not fully observed.
+Therefore the mechanism is **not** ignorable for likelihood-based estimation
+
+**(c)** Missing data mechanism --> MAR. 
+This is true because the missingness depends on $Y_1$ and it's mean $\mu_1$ which are fully observed. 
+Therefore the mechanism is ignorable for likelihood-based estimation
