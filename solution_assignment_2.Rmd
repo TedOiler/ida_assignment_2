@@ -6,6 +6,9 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(maxLik)
+library(dplyr)
+library(tidyr)
 ```
 
 ## Question 1
@@ -31,7 +34,7 @@ In order to reach the conclusion of the exercise I will define first these.
 $X_i = Y_iR_i + C(1-R_i) 	\iff X_i^2 = Y_i^2R_i^2 + 2Y_iR_iC(1-R_i) + C^2(1-R_i)^2$
 
 
-$\text{We know that} ~~R_i = 0 ~~	\lor~~ R_i=1 ~~\text{therefore}~~ 2Y_iR_iC(1-R_i)=0$
+$\text{We know that} ~~R_i = 0 ~~	\lor~~ R_i=1 ~~\text{therefore}~~ 2Y_iR_iC(1-R_i)=0$=
 
 
 $\text{If} ~~R_i = 0 ~~ \text{then}~~ R_i^2 = R_i ~~and~~ (1-R_i)^2 = (1-R_i)$
@@ -119,8 +122,6 @@ Hence: $\log L(\mu, \sigma^2 | x, r) = \log \prod [\phi(x_i;\mu, \sigma^2)^{r_i}
 
 ```{r, include=TRUE, message=FALSE, warning=FALSE, tidy=TRUE, fig.align='center', results="hold"}
 # https://cran.r-project.org/web/packages/maxLik/maxLik.pdf
-
-library(maxLik)
 load(file = 'dataex2.Rdata')
 
 ll <- function(m, df){
@@ -146,7 +147,7 @@ Based on the lecture 'Likelihood based inference with incomplete data' we know t
 1) The missing data are MAR (or MCAR)
 2) the parameter $\psi$ which is the parameter of the missing mechanism and the parameters of the model $\theta$ are distinct. 
 
-On this example we know that they are distinct because in all the sub-question is is stated. 
+On this examples we know that point true is true because it is stated as such in all the sub-questions. 
 So we only have to consider the first point to answer the question. 
 
 What we are doing on each example is the following 
@@ -164,3 +165,50 @@ Therefore the mechanism is **not** ignorable for likelihood-based estimation
 **(c)** Missing data mechanism --> MAR. 
 This is true because the missingness depends on $Y_1$ and it's mean $\mu_1$ which are fully observed. 
 Therefore the mechanism is ignorable for likelihood-based estimation
+
+
+## Question 4
+
+```{r, include=TRUE, message=FALSE, warning=FALSE, tidy=TRUE, fig.align='center', results="hold"}
+load('dataex4.Rdata') 
+
+# modifying dataset to be easier to work with
+df4 <- dataex4 %>%
+  arrange(Y) %>% 
+  mutate(R = (Y == 0 | Y == 1)*1) %>% 
+  replace_na(list(R = 0)) %>% 
+  replace_na(list(Y = 2))
+
+# helper function to evaluate the sigmoid easier
+sigmoid <- function(bb, x){
+  b0 <- bb[1]
+  b1 <- bb[2]
+  sig = (1 + exp(-b0-b1*x))
+  return(sig)
+}
+
+# E step
+q_fun <- function(bb, df){
+  b0 <- bb[1];  b1 <- bb[2]
+  xx <- df$X;  yy <- df$Y;  rr <- df$R
+  bb_plus = c(b0 + b1*xx)
+  bb_minus = c(-b0-b1*xx)
+  q <- -sum(rr*log(1 + exp(-b0-b1*xx)) + (1-rr)*log(1+exp(b0+b1*xx)) +
+              sigmoid(bb_minus, xx)*log(1 + exp(-b0-b1*xx)) + sigmoid(bb_plus, xx)*log(1+exp(b0+b1*xx)))
+  return(bb_plus)
+}
+
+# M step
+epsilon = 1e-8 # tolerance set to machine precesion 
+beta_old = c(1,1)
+beta_new = c(0,0)
+
+while(max(abs(beta_old - beta_new)) > epsilon){
+   beta_new = maxLik(q_fun, df=df4, start=beta_old, method='nr')
+   beta_old = beta_new
+   print(beta_new)
+}
+
+summary(beta_new)
+
+```
