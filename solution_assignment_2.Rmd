@@ -321,18 +321,28 @@ cat(res)
 ```
 
 ```{r, include=TRUE, message=FALSE, warning=FALSE, tidy=TRUE, fig.align='center', results="hold"}
-p <- as.double(theta[1]); mu <- as.double(theta[2]); sigma_sq <- as.double(theta[3]); lambda <- as.double(theta[4])
-print(sqrt(sigma_sq))
-#std <- s(sigma_sq)
+p <- as.double(res[1]); mu <- as.double(res[2]); sigma_sq <- as.double(res[3]); lambda <- as.double(res[4])
+std <- sqrt(sigma_sq)
+std <- sqrt(sigma_sq)
 
 dist1 <- p * dlnorm(dataex5, mu, std)
 dist2 <- (1 - p) * dexp(dataex5, lambda)
-mm = dist1 + dist2
+orange = rgb(1, 0.65, 0, 0.35)
+blue = rgb(0.65, 0.75, 1)
 
 hist(dataex5,
      xlab = 'data',
-     freq = FALSE
+     freq = FALSE,
+     col = orange,
+     ylim=c(0,0.15),
      )
-curve(mm)
-
+curve(p * dlnorm(x, mu, std) + (1 - p) * dexp(x, lambda),
+      add=TRUE,
+      col=blue,
+      lwd=4,
+      type='o'
+      )
+legend(100,0.13,legend = c('Histogram', 'MM pdf'), 
+       fill = c(orange, blue),
+       bty='o')
 ```
