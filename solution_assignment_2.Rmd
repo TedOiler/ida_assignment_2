@@ -3,7 +3,7 @@ title: |
   <center> University of Edinburgh, School of Mathematics </center>
   <center> Incomplete Data Analysis, 2020/2021 </center>
   <center> Assignment 2 -- Solutions </center>
-author: "Ted Ladas"
+author: 'Ted Ladas'
 output:
   pdf_document: default
   html_document:
@@ -16,6 +16,9 @@ library(maxLik)
 library(dplyr)
 library(tidyr)
 ```
+
+
+Github Repo: https://github.com/TedOiler/ida_assignment_2
 
 ## Question 1
 
@@ -155,8 +158,9 @@ Based on the lecture 'Likelihood based inference with incomplete data' we know t
 1) The missing data are MAR (or MCAR)
 2) the parameter $\psi$ which is the parameter of the missing mechanism and the parameters of the model $\theta$ are distinct. 
 
-On this examples we know that point true is true because it is stated as such in all the sub-questions. 
+On examples (a) and (b) we notice that point (2) is true because. 
 So we only have to consider the first point to answer the question. 
+More detail for (c) on the corresponding subsection.
 
 What we are doing on each example is the following 
 We express the probability of a datapoint missing as a linear model of various other variables and parameters. 
@@ -171,8 +175,9 @@ This is true because the missingness depends on $Y_2$ which is not fully observe
 Therefore the mechanism is **not** ignorable for likelihood-based estimation
 
 ## (c) Missing data mechanism --> MAR. 
-This is true because the missingness depends on $Y_1$ and it's mean $\mu_1$ which are fully observed. 
-Therefore the mechanism is ignorable for likelihood-based estimation
+This is true because the missingness depends on $Y_1$.
+However we notice that $\mu_1$ is part of the missingness mechanism so condition (2) is not true.
+Therefore the mechanism is **not** ignorable for likelihood-based estimation
 
 \newpage
 
