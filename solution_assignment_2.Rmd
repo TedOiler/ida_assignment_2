@@ -180,35 +180,37 @@ df4 <- dataex4 %>%
   replace_na(list(Y = 2))
 
 # helper function to evaluate the sigmoid easier
-sigmoid <- function(bb, x){
+sigmoid <- function(bb, xx){
   b0 <- bb[1]
   b1 <- bb[2]
-  sig = (1 + exp(-b0-b1*x))
+  sig = exp(b0+b1*xx)/(1 + exp(b0+b1*xx))
   return(sig)
 }
 
 # E step
 q_fun <- function(bb, df){
   b0 <- bb[1];  b1 <- bb[2]
-  xx <- df$X;  yy <- df$Y;  rr <- df$R
-  bb_plus = c(b0 + b1*xx)
-  bb_minus = c(-b0-b1*xx)
-  q <- -sum(rr*log(1 + exp(-b0-b1*xx)) + (1-rr)*log(1+exp(b0+b1*xx)) +
-              sigmoid(bb_minus, xx)*log(1 + exp(-b0-b1*xx)) + sigmoid(bb_plus, xx)*log(1+exp(b0+b1*xx)))
-  return(bb_plus)
+  xx <- df[,1];  yy <- df[,2];  rr <- df[,3]
+  #bb_vector = c(b0 + b1*xx)
+  #q <- -sum(yy*rr*log(1 + exp(-b0-b1*xx)) + (1-rr)*log(1+exp(b0+b1*xx)) + sigmoid(bb_minus, xx)*log(1 + exp(-b0-b1*xx)) + sigmoid(bb_plus, xx)*log(1+exp(b0+b1*xx)))
+  q <- sum((rr*yy*(b0+b1*xx)) - log(1 + exp(b0+b1*xx))  )#+ (1 - rr)*(b0 + b1*xx)*sigmoid(bb, xx))
+  return(q)
 }
 
 # M step
 epsilon = 1e-8 # tolerance set to machine precesion 
 beta_old = c(1,1)
-beta_new = c(0,0)
 
-while(max(abs(beta_old - beta_new)) > epsilon){
-   beta_new = maxLik(q_fun, df=df4, start=beta_old, method='nr')
-   beta_old = beta_new
-   print(beta_new)
+repeat{
+  beta_new = coef(maxLik(logLik=q_fun, df=df4, start=beta_old))
+  print(beta_new)
+  convergence = max(abs(beta_old - beta_new)) < epsilon
+  if(convergence){
+   break
+  }
+  
+  beta_old = beta_new
 }
 
-summary(beta_new)
-
+cat(beta_new)
 ```
