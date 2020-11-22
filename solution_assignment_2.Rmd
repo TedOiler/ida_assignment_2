@@ -32,7 +32,7 @@ $R_i = \begin{cases}
             0 & Y_i>C\\
           \end{cases}$
           
-**a)** Calculation of $\hat{\theta}_{MLE}$ 
+## a) Calculation of $\hat{\theta}_{MLE}$ 
 
 We need to calculate the pdf of the data given theta, the survival function of the upper censor point, and the Likelihood of the data given theta.
 In order to reach the conclusion of the exercise I will define first these. 
@@ -79,7 +79,7 @@ and since $\theta \geq 0$
 $-2\theta\sum{r_i}+\sum{X_i^2} = 0 \iff \hat{\theta_{MLE}} = \frac{\sum{X_i^2}}{2\sum{r_i}}$
 
 
-**b)** We know that $I(\theta) = -\mathbb{E}\left[\frac{d^2l(\theta)}{d\theta^2}\right]$
+## b) We know that $I(\theta) = -\mathbb{E}\left[\frac{d^2l(\theta)}{d\theta^2}\right]$
 
 and also that $\mathbb{E}[R_i] = 1P(R_i=1) + 0P(R_i=0) = P(Y\leq C) = F(C;\theta) = 1 - e^{-C^2/(2\theta)} ~~\text{and therefore}~~ \mathbb{E}[1 - R_i] = 1 - \mathbb{E}[R_i] = e^{-C^2/(2\theta)}$
 
@@ -93,7 +93,7 @@ $n/\theta^2 (1 - e^{-C^2/(2\theta)}) n/\theta^3 (-C^2e^{-C2/2\theta} + 2\theta(1
 $I(\theta) = \frac{n}{\theta^2}(1 - e^{-C^2/(2\theta)})$
 
 
-**c)** Since we know that $\hat{\theta_{MLE}} \sim N(\theta , I(\theta)^{-1})~~$ we can Normalize $\hat{\theta_{MLE}}$ and produce the 95% confidence interval as follows
+## c) Since we know that $\hat{\theta_{MLE}} \sim N(\theta , I(\theta)^{-1})~~$ we can Normalize $\hat{\theta_{MLE}}$ and produce the 95% confidence interval as follows
 
 $Z = \frac{\hat{\theta_{MLE}} - \theta}{\sqrt{I(\theta)^{-1}}} \sim N(0,1)$
 
@@ -107,7 +107,7 @@ $[z_{-a/2}\sqrt{I(\theta)^-1}, z_{a/2}\sqrt{I(\theta)^-1}]$
 
 # Question 2
 
-**a)** 
+## a)
 
 Like question 1a our likelihood is the product of the censored and the noncencored data. 
 Since we know that the Normal distribution belongs to the exponential family, we could recompute the likelihood and prove the statement. 
@@ -125,7 +125,7 @@ So. $X_i \sim N(\mu, \sigma^2)$
 
 Hence: $\log L(\mu, \sigma^2 | x, r) = \log \prod [\phi(x_i;\mu, \sigma^2)^{r_i} \times \Phi(x_i; \mu, \sigma^2)] = \sum_{i=1}^n\{r_i\log \phi(x_i, \mu, \sigma^2) + (1-r_i)\Phi(x_1; \mu, \sigma^2)\}$
 
-**b)** --> $\mu = 5.559766$
+## b) --> $\mu = 5.559766$
 
 ```{r, include=TRUE, message=FALSE, warning=FALSE, tidy=TRUE, fig.align='center', results="hold"}
 # https://cran.r-project.org/web/packages/maxLik/maxLik.pdf
@@ -162,21 +162,63 @@ What we are doing on each example is the following
 We express the probability of a datapoint missing as a linear model of various other variables and parameters. 
 The logit() function serves the purpose of transforming the support of our probability $R_f \in [0,1]$ to $R_{logit{f}} \in (-\infty, +\infty)$ so that our line makes sense.
 
-**(a)** Missing data mechanism --> MAR. 
+## (a) Missing data mechanism --> MAR. 
 This is true because the missingness depends on $Y_1$ which is fully observed. 
 Therefore the mechanism is ignorable for likelihood-based estimation
 
-**(b)** Missing data mechanism --> MNAR
+## (b) Missing data mechanism --> MNAR
 This is true because the missingness depends on $Y_2$ which is not fully observed.
 Therefore the mechanism is **not** ignorable for likelihood-based estimation
 
-**(c)** Missing data mechanism --> MAR. 
+## (c) Missing data mechanism --> MAR. 
 This is true because the missingness depends on $Y_1$ and it's mean $\mu_1$ which are fully observed. 
 Therefore the mechanism is ignorable for likelihood-based estimation
 
 \newpage
 
-## Question 4
+# Question 4
+
+Theoretical Implementation:
+
+since we know that $Y_i$ are **individual** draws from a Bernoulli Distribution we can calculate the likelihood as follows: 
+
+
+$L(\beta) = \prod_{i=1}^N[p_i(\beta)^{y_i}(1-p_i(\beta))^{1-y_i}]$ 
+
+
+where  
+
+$\beta = [\beta_0~~\beta_1]^\top$
+
+
+$p_i(\beta) = \sigma(\beta_0 + \beta_1x_i)$
+
+
+Therefore: 
+
+
+$\ell(\beta) = \log L(\beta) = \sum_{i=1}^N [y_i \log(\frac{e^{\beta_0+\beta_1x_1}}{1+e^{\beta_0+\beta_1x_1}}) + (1 - y_i)\log(\frac{1}{1+e^{\beta_0+\beta_1x_1}})] = \sum_{i=1}^N [y_i(e^{\beta_0 + \beta_1 x_i}) - y_i \log(1+(e^{\beta_0 + \beta_1 x_i})) - \log(1 + (e^{\beta_0 + \beta_1 x_i})) + y_i \log((1 + e^{\beta_0 + \beta_1 x_i}))] \iff$
+
+
+$\ell(\beta) = \sum_{i=1}^Ny_i(\beta^\top x_i) - \log(1 + e^{\beta^\top x_i})$
+
+
+So our $Q$ function, keeping in mind that the missing data are from m+1 to n, without loss of generality:
+
+
+$\ell(\beta) = \sum_{i=1}^My_i(\beta^\top x_i) + \sum_{i=m+1}^N\mathbb{E}[y_i](\beta^\top x_i) - \log(1 + e^{\beta^\top x_i})$
+
+
+and since we know that $Y_i \sim Bernoulli(p_i(\beta))$ we know that 
+
+
+$\mathbb{E}[y_i] = p_i(\beta)$
+
+
+$\ell(\beta) = \sum_{i=1}^My_i(\beta^\top x_i) + \sum_{i=m+1}^N p_i(\beta)(\beta^\top x_i) - \log(1 + e^{\beta^\top x_i})$
+
+
+Them we can maximize the Q function as in Question 2 with the maxLik function
 
 ```{r, include=TRUE, message=FALSE, warning=FALSE, tidy=TRUE, fig.align='center', results="hold"}
 load('dataex4.Rdata') 
@@ -209,7 +251,7 @@ beta_old = c(1,-1)
 
 repeat{
   beta_new = coef(maxLik(logLik=q_fun, df=df4, start=beta_old))
-  convergence = max(abs(beta_old - beta_new)) < epsilon
+  convergence = sum(abs(beta_old - beta_new)) < epsilon
   if(convergence){
    break
   }
@@ -222,9 +264,9 @@ cat(beta_new)
 
 \newpage
 
-## Question 5
+# Question 5
 
-**(a)**
+## (a)
 
 - Our mixture model is:
 
@@ -280,7 +322,7 @@ $\frac{\partial Q(\boldsymbol{\theta}|\boldsymbol{\theta^{(t)}})}{\partial \lamb
 $\lambda^{(t+1)} = \frac{\sum_{i=1}^N(1- \tilde{p_i}^{(t)})}{\sum_{i=1}^N(1- \tilde{p_i}^{(t)})y_i}$
 
 
-**(b)**
+## (b)
 We can easily take the expressions for the E and M step and derive the algorithm. 
 
 ```{r, include=TRUE, message=FALSE, warning=FALSE, tidy=TRUE, fig.align='center', results="hold"}
