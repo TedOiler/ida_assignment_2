@@ -199,12 +199,12 @@ sigmoid <- function(bb, xx){
 q_fun <- function(bb, df){
   b0 <- bb[1];  b1 <- bb[2]
   xx <- df[,1];  yy <- df[,2];  rr <- df[,3]
-  q <- sum((rr*yy*(b0+b1*xx)) - log(1 + exp(b0+b1*xx))  + (1-rr)*(b0 + b1*xx)*sigmoid(bb, xx))
+  q <- sum((rr*(yy*(b0+b1*xx)) - log(1 + exp(b0+b1*xx)))  + (1-rr)*(b0 + b1*xx)*sigmoid(bb, xx) - log(1 + exp(b0+b1*xx)))
   return(q)
 }
 
 # M step
-epsilon = 1e-8 # tolerance set to machine precesion 
+epsilon = 1e-8 # tolerance set to machine precision 
 beta_old = c(1,1)
 
 repeat{
@@ -220,3 +220,8 @@ repeat{
 
 cat(beta_new)
 ```
+
+\newpage
+
+## Question 5
+
