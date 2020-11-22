@@ -199,17 +199,16 @@ sigmoid <- function(bb, xx){
 q_fun <- function(bb, df){
   b0 <- bb[1];  b1 <- bb[2]
   xx <- df[,1];  yy <- df[,2];  rr <- df[,3]
-  q <- sum((rr*(yy*(b0+b1*xx)) - log(1 + exp(b0+b1*xx)))  + (1-rr)*(b0 + b1*xx)*sigmoid(bb, xx) - log(1 + exp(b0+b1*xx)))
+  q <- sum((rr*(yy*(b0+b1*xx)) - log(1 + exp(b0+b1*xx)))  + (1-rr)*(b0 + b1*xx)*sigmoid(bb, xx) )#- log(1 + exp(b0+b1*xx)))
   return(q)
 }
 
 # M step
 epsilon = 1e-8 # tolerance set to machine precision 
-beta_old = c(1,1)
+beta_old = c(1,-1)
 
 repeat{
   beta_new = coef(maxLik(logLik=q_fun, df=df4, start=beta_old))
-  print(beta_new)
   convergence = max(abs(beta_old - beta_new)) < epsilon
   if(convergence){
    break
@@ -225,3 +224,37 @@ cat(beta_new)
 
 ## Question 5
 
+**(a)**
+
+**(b)**
+
+```{r, include=TRUE, message=FALSE, warning=FALSE, tidy=TRUE, fig.align='center', results="hold"}
+load('dataex5.Rdata')
+mixture_model <- function(y, theta0, eps){
+  theta <- theta0
+  
+  diff <- 1
+  while(diff > eps){
+    theta_old <- theta0
+    
+    #E-step
+    dist1 <- 1
+    dist2 <- 1
+    q <- dist1 / (dist1 + dist2)
+    
+    #M-step
+    param1 <- 0.1
+    param2 <- 1
+    param3 <- 0.5^2
+    param4 <- 2
+    theta <- c(param1,param2,param3,param4)
+    diff <- sum(abs(theta - theta_old))
+    cat(diff)
+  }
+  return(theta)
+}
+
+theta_start = c(0.1, 1, 0.5^2, 2)
+res <- mixture_model(y=y, theta0=theta_start, eps=epsilon)
+cat(res)
+```
