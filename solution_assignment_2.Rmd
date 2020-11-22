@@ -122,6 +122,7 @@ We know that $Y_i \sim N(\mu, \sigma^2)$ If we can show that $X_i \sim N(\mu, \s
 $X_i = YiRi + D(1-R_i)$
 
 Since our $X$ is an affine transformation of a normal, we can write it as $X = g(Y)$ where $g$ linear. 
+Secondly we notice that the data are right sencored which means: $P(Y<D; \mu, \sigma^2) = 1-S(Y;\mu) = F(Y)$
 Together with the fact that $R_i$ have a binary nature of $0 \lor 1$ we have our result.
 
 So. $X_i \sim N(\mu, \sigma^2)$
