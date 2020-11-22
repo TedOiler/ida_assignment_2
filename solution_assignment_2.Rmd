@@ -1,7 +1,13 @@
 ---
-title: "Assignment 2 Solution"
-author: "Ted Ladas -s2124289"
-output: pdf_document
+title: |
+  <center> University of Edinburgh, School of Mathematics </center>
+  <center> Incomplete Data Analysis, 2020/2021 </center>
+  <center> Assignment 2 -- Solutions </center>
+author: "Ted Ladas"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -97,6 +103,7 @@ $a = 0.05 ~~\text{hence}~~ z_{-a/2} = -1.959964, z_{a/2} = 1.959964$
 
 $[z_{-a/2}\sqrt{I(\theta)^-1}, z_{a/2}\sqrt{I(\theta)^-1}]$
 
+\newpage
 
 # Question 2
 
@@ -139,6 +146,7 @@ mle = maxLik(logLik = ll, df=dataex2, start=start, method='nr') # Newton-Raphson
 summary(mle)
 ```
 
+\newpage
 
 # Question 3
 
@@ -166,6 +174,7 @@ Therefore the mechanism is **not** ignorable for likelihood-based estimation
 This is true because the missingness depends on $Y_1$ and it's mean $\mu_1$ which are fully observed. 
 Therefore the mechanism is ignorable for likelihood-based estimation
 
+\newpage
 
 ## Question 4
 
@@ -174,10 +183,9 @@ load('dataex4.Rdata')
 
 # modifying dataset to be easier to work with
 df4 <- dataex4 %>%
-  arrange(Y) %>% 
   mutate(R = (Y == 0 | Y == 1)*1) %>% 
   replace_na(list(R = 0)) %>% 
-  replace_na(list(Y = 2))
+  replace_na(list(Y = 999))
 
 # helper function to evaluate the sigmoid easier
 sigmoid <- function(bb, xx){
@@ -191,9 +199,7 @@ sigmoid <- function(bb, xx){
 q_fun <- function(bb, df){
   b0 <- bb[1];  b1 <- bb[2]
   xx <- df[,1];  yy <- df[,2];  rr <- df[,3]
-  #bb_vector = c(b0 + b1*xx)
-  #q <- -sum(yy*rr*log(1 + exp(-b0-b1*xx)) + (1-rr)*log(1+exp(b0+b1*xx)) + sigmoid(bb_minus, xx)*log(1 + exp(-b0-b1*xx)) + sigmoid(bb_plus, xx)*log(1+exp(b0+b1*xx)))
-  q <- sum((rr*yy*(b0+b1*xx)) - log(1 + exp(b0+b1*xx))  )#+ (1 - rr)*(b0 + b1*xx)*sigmoid(bb, xx))
+  q <- sum((rr*yy*(b0+b1*xx)) - log(1 + exp(b0+b1*xx))  + (1-rr)*(b0 + b1*xx)*sigmoid(bb, xx))
   return(q)
 }
 
